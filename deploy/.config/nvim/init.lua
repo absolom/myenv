@@ -1,16 +1,20 @@
 local Plug = vim.fn['plug#']
 vim.call('plug#begin', '~/.local/share/nvim/plugged')
-Plug 'mg979/vim-visual-multi'
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-Plug 'vim-scripts/taglist.vim'
-Plug 'joe-skb7/cscope-maps'
-Plug 'flazz/vim-colorschemes'
-Plug 'rafi/awesome-vim-colorschemes'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
-Plug 'neovim/nvim-lspconfig'
-Plug('neoclide/coc.nvim', {branch = 'release'})
+  Plug 'mg979/vim-visual-multi'
+  Plug 'junegunn/fzf'
+  Plug 'junegunn/fzf.vim'
+  Plug 'vim-scripts/taglist.vim'
+  Plug 'joe-skb7/cscope-maps'
+  Plug 'flazz/vim-colorschemes'
+  Plug 'rafi/awesome-vim-colorschemes'
+
+--  Plug 'sharkdp/fd'
+--  Plug 'BurntSushi/ripgrep'
+--  Plug 'nvim-treesitter/nvim-treesitter'
+--  Plug 'nvim-lua/plenary.nvim'
+--  Plug 'nvim-telescope/telescope.nvim'
+
+  Plug('neoclide/coc.nvim', {branch = 'release'})
 vim.call('plug#end')
 
 vim.cmd([[
@@ -198,6 +202,8 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 ]])
+
+vim.cmd('colorscheme seattle')
 
 -- require'lspconfig'.pyright.setup{}
 -- require'lspconfig'.clangd.setup{}
