@@ -3,52 +3,70 @@
 # Using alpine linux for base image
 FROM alpine
 
+# If you have a proxy, set these
+# ENV http_proxy=...
+# ENV https_proxy=...
+
+ARG UNAME=mike
+ARG GNAME=gamers
+ARG UID=1000
+ARG GID=1000
+
 # Install packages and setup user
 RUN apk update && \
-apk add sudo bash gcc g++ make cmake git tmux perl curl vim the_silver_searcher ctags clang clang-extra-tools nodejs npm build-base cmake automake autoconf libtool pkgconf coreutils curl unzip gettext-tiny-dev ripgrep fd && \
-apk add cscope --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing && \
-addgroup -S gamers && adduser -S mike -G gamers -s /usr/bash && \
-adduser mike wheel && \
-sed -e 's;^# \(%wheel.*NOPASSWD.*\);\1;g' -i /etc/sudoers
+apk add alpine-sdk sudo bash gcc g++ make cmake git tmux perl curl the_silver_searcher ctags nodejs && \
+apk add npm build-base cmake automake autoconf libtool pkgconf coreutils curl unzip && \
+apk add gettext-tiny-dev ripgrep fd python3 && \
+apk add fzf fzf-bash-completion fzf-vim py3-pip shadow && \
+apk add cscope --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
 
-# Swap to new user
-USER mike
+## apk add clang clang-static clang-dev llvm-dev llvm-static clang-extra-tools
+## addgroup -S gamers && adduser -S mike -G gamers -s /usr/bash && \
+## adduser mike wheel && \
+## sed -e 's;^# \(%wheel.*NOPASSWD.*\);\1;g' -i /etc/sudoers
 
-# latest clangd compilation, takes a long time so it gets its own layer
-RUN cd /home/mike && \
+# Build and install clangd
+RUN cd /root && \
 git clone https://github.com/llvm/llvm-project && \
 mkdir llvm-project/build && \
 cd llvm-project/build && \
 cmake /home/mike/llvm-project/llvm/ -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" && \
 cmake --build . && \
-cmake --build . --target install
+sudo cmake --build . --target install && \
+cd ../.. && rm -rf llvm-project
 
-# Clone some repos to test compiler and vim with and compile latest neovim
-RUN cd /home/mike && git clone https://github.com/libretro/libretro-super && \
-cd libretro-super && ./libretro-fetch.sh retroarch && cd retroarch && cscope -Rb && cd /home/mike && \
-git clone https://github.com/neovim/neovim && cd neovim && make && sudo make install
+# Build and install neovim
+RUN cd /root && git clone https://github.com/neovim/neovim && cd neovim && make && sudo make install && cd .. && rm -rf neovim
 
-sudo apk add python3
+# Create user
+RUN groupadd -g $GID $GNAME && \
+useradd -s /bin/bash -g $GID -u $UID $UNAME && \
+adduser $UNAME wheel && \
+sed -e 's;^# \(%wheel.*NOPASSWD.*\);\1;g' -i /etc/sudoers
 
 # Copy scripts/env
-COPY --chown=mike:gamer deploy/ /home/mike
+COPY deploy/ /home/mike
 
-# Setup user specific stuff
-RUN cd /home/mike && sudo apk add fzf fzf-bash-completion fzf-vim && \
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim && \
-vim +'PlugInstall --sync' +qa           && \
-mkdir -p /home/mike/.config/coc         && \
-sudo npm i -g pyright                   && \
-mkdir -p .config/nvim                   && \
+# Swap to new user
+USER mike
+
+# If you have a proxy, set these
+# ENV http_proxy=...
+# ENV https_proxy=...
+
+
+# Clone some repos to test compiler and vim with and compile latest neovim
+RUN sudo chown -R $UNAME:$GNAME /home/$UNAME && \
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim' && \
-nvim +'PlugInstall --sync' +qa
+mkdir -p /home/$UNAME/.config/nvim && \
+pip3 --trusted-host files.pythonhosted.org --trusted-host pypi.org install compiledb && \
+sudo npm i -g pyright && \
+nvim +'PlugInstall --sync' +qa && \
+# --trusted-host args are probably not needed if not behind a firewall
 
-# -fix alt-c
-# /Add vim plugins
-# -Try neovim
-# -Write the above as a shell script, then write another script to conver it to a dockerfile
-# *Configure clangd : https://clangd.llvm.org/installation.html#project-setup
-# -Escape key not working in vim in tmux
+# Clone some source to test the environment
+RUN cd /home/mike && git clone https://github.com/libretro/libretro-super && \
+cd libretro-super && ./libretro-fetch.sh retroarch && cd retroarch
 
 # vim command reference
 #

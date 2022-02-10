@@ -6,3 +6,5 @@ if [ "$?" == "0" ]; then
   docker container rm $IMAGE_SHA
   docker image rm mimc/alpine-dev:1.0
 fi
+
+# docker create -it --entrypoint=/bin/bash -v /local/path:/mnt --privileged mimc/alpine-dev:1.0

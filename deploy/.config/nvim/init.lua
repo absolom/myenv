@@ -7,6 +7,9 @@ vim.call('plug#begin', '~/.local/share/nvim/plugged')
   Plug 'joe-skb7/cscope-maps'
   Plug 'flazz/vim-colorschemes'
   Plug 'rafi/awesome-vim-colorschemes'
+  Plug 'mileszs/ack.vim'
+
+-- Plug 'prabirshrestha/vim-lsp'
 
 --  Plug 'sharkdp/fd'
 --  Plug 'BurntSushi/ripgrep'
@@ -16,6 +19,12 @@ vim.call('plug#begin', '~/.local/share/nvim/plugged')
 
   Plug('neoclide/coc.nvim', {branch = 'release'})
 vim.call('plug#end')
+
+vim.cmd([[
+if executable('ag')
+  let g:ackprg = 'ag --vimgrep'
+endif
+]])
 
 vim.cmd([[
 set nowrap

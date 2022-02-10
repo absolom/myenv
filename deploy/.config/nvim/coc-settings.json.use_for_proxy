@@ -1,4 +1,7 @@
 {
+  "http.proxyStrictSSL": false,
+  "http.proxy": "http://proxy-web.micron.com:80",
+
   "languageserver":
   {
     "clangd":
