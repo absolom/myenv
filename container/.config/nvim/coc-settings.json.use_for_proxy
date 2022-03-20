@@ -1,0 +1,5 @@
+Remove the .use_for_proxy from this file, remove this line, and add proxy below
+{
+  "http.proxyStrictSSL": false,
+  "http.proxy": "<PUT_PROXY_HERE>",
+}

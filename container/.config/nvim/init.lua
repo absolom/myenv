@@ -7,38 +7,56 @@ vim.call('plug#begin', '~/.local/share/nvim/plugged')
   Plug 'joe-skb7/cscope-maps'
   Plug 'flazz/vim-colorschemes'
   Plug 'rafi/awesome-vim-colorschemes'
-  Plug 'mileszs/ack.vim'
-
--- Plug 'prabirshrestha/vim-lsp'
-
---  Plug 'sharkdp/fd'
---  Plug 'BurntSushi/ripgrep'
---  Plug 'nvim-treesitter/nvim-treesitter'
---  Plug 'nvim-lua/plenary.nvim'
---  Plug 'nvim-telescope/telescope.nvim'
+  Plug 'itchyny/lightline.vim'
+  Plug 'Pocco81/AutoSave.nvim'
+  Plug 'axel4f/vim-strip-trailing-whitespace'
 
   Plug('neoclide/coc.nvim', {branch = 'release'})
 vim.call('plug#end')
 
-vim.cmd([[
-if executable('ag')
-  let g:ackprg = 'ag --vimgrep'
-endif
-]])
+local autosave = require("autosave")
+
+autosave.setup(
+    {
+        enabled = true,
+        execution_message = "AutoSave: saved at " .. vim.fn.strftime("%H:%M:%M"),
+        events = {"InsertLeave", "TextChanged"},
+        conditions = {
+            exists = true,
+            filename_is_not = {},
+            filetype_is_not = {},
+            modifiable = true
+        },
+        write_all_buffers = false,
+        on_off_commands = true,
+        clean_command_line_interval = 0,
+        debounce_delay = 135
+    }
+)
+
+
+-- vim.cmd([[
+-- if executable('ag')
+--   let g:ackprg = 'ag --vimgrep'
+-- endif
+-- ]])
 
 vim.cmd([[
 set nowrap
 imap jk <Esc>
 syntax on
-set tabstop=8
-set softtabstop=2
-set shiftwidth=2
+set expandtab
+set tabstop=4
+set shiftwidth=4
 set backspace=indent,eol,start
 set termguicolors
+set list
+set listchars=tab:>-,trail:~,extends:>,precedes:<
 if exists('$TMUX')
   let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
   let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 endif
+autocmd FileType * setlocal formatoptions-=ro
 ]])
 
 vim.cmd([[
